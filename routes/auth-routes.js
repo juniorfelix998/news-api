@@ -1,13 +1,8 @@
 const router = require("express").Router();
-const {ensureAuthenticated} = require("../middleware/auth-middleware");
-const {
-    login,
-    register,
-    verify,
-    forgotPassword,
-    resetPassword,
-    changePassword
-} = require("../controllers/auth-controller");
+const {validationRules, validate} = require("../validations/user-validator");
+const { login, register, verify, forgotPassword, resetPassword, changePassword } = require("../controllers/auth-controller");
+const { ensureAuthenticated } = require("../middleware/auth-middleware");
+const { validationRules: passwordValidationRules, validate: passwordValidate } = require("../validations/change-password-validator");
 
 router.post('/login', async (req, res) => {
     /*  #swagger.tags = ['Auth']
@@ -19,7 +14,7 @@ router.post('/login', async (req, res) => {
     await login(req.body, res);
 });
 
-router.post('/register', async (req, res) => {
+router.post('/register', validationRules(), validate, async (req, res) => {
     /*  #swagger.tags = ['Auth']
     	#swagger.parameters['obj'] = {
             in: 'body',
@@ -50,7 +45,7 @@ router.post('/forgotPassword', async (req, res) => {
     await forgotPassword(req.body, res);
 });
 
-router.post('/resetPassword', async (req, res) => {
+router.post('/resetPassword', passwordValidationRules(), passwordValidate, async (req, res) => {
     /*  #swagger.tags = ['Auth']
     	#swagger.parameters['obj'] = {
             in: 'body',
@@ -60,7 +55,7 @@ router.post('/resetPassword', async (req, res) => {
     await resetPassword(req.body, res);
 });
 
-router.post("/changePassword", ensureAuthenticated, async (req, res) => {
+router.post("/changePassword", ensureAuthenticated, passwordValidationRules(), passwordValidate, async (req, res) => {
     /*  #swagger.tags = ['Auth']
         #swagger.security = [{
         "Authorization": []

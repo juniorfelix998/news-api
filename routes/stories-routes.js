@@ -1,32 +1,43 @@
 const router = require("express").Router();
-const {ensureAuthenticated, ensureAuthorized} = require("../middleware/auth-middleware");
-const {
-    addOne,
-    removeOne,
-    updateOne,
-    getAll,
-    getOne,
-    getOneBySlug,
-    getTopStories
-} = require("../controllers/stories-controller");
+const path = require("path");
+const multer = require("multer");
+const { ensureAuthenticated, ensureAuthorized } = require("../middleware/auth-middleware");
+const {validationRules, validate} = require("../validations/story-validator");
+const { addOne, removeOne, updateOne, getAll, getOne, getOneBySlug, getTopStories} = require("../controllers/stories-controller");
+const PATH = "../public/";
 
-router.get("/stories", async (req, res) => {
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, PATH));
+    },
+    filename: (req, file, cb) => {
+        const fileName = Date.now() + path.extname(file.originalname);
+        req.body.imageUrl = fileName;
+        cb(null, fileName);
+    },
+});
+
+const upload = multer({
+    storage: storage,
+});
+
+router.get("/stories",  async (req, res) => {
     // #swagger.tags = ['Posts']
 
     await getAll(req, res);
 });
 
-router.get("/stories/top", async (req, res) => {
+router.get("/stories/top",  async (req, res) => {
     // #swagger.tags = ['Posts']
 
     await getTopStories(req, res);
 });
 
-// router.post("/stories", ensureAuthenticated, ensureAuthorized(["admin"]),
-//     upload.any("files")
-// );
+router.post("/stories", ensureAuthenticated, ensureAuthorized(["admin"]),
+    upload.any("files")
+);
 
-router.post("/stories", ensureAuthenticated, ensureAuthorized(["admin"]), async (req, res) => {
+router.post("/stories", ensureAuthenticated, ensureAuthorized(["admin"]), validationRules(), validate, async (req, res) => {
     /*  #swagger.tags = ['Posts']
         #swagger.consumes = ['multipart/form-data']
         #swagger.security = [{
@@ -59,7 +70,7 @@ router.post("/stories", ensureAuthenticated, ensureAuthorized(["admin"]), async 
     await addOne(req, res);
 });
 
-router.put("/stories/:id", ensureAuthenticated, ensureAuthorized(["admin"]), async (req, res) => {
+router.put("/stories/:id", ensureAuthenticated, ensureAuthorized(["admin"]), validationRules(), validate, async (req, res) => {
     /*  #swagger.tags = ['Posts']
         #swagger.security = [{
         "Authorization": []

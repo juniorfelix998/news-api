@@ -1,8 +1,10 @@
 const router = require("express").Router();
 const { ensureAuthenticated } = require("../middleware/auth-middleware");
+const {validationRules, validate }  = require("../validations/comment-validator");
 const { addOne, removeOne } = require("../controllers/comments-controller");
 
-router.post("/comments", ensureAuthenticated, async (req, res) => {
+
+router.post("/comments", ensureAuthenticated, validationRules(), validate, async (req, res) => {
     /*  #swagger.tags = ['Posts']
         #swagger.security = [{
         "Authorization": []

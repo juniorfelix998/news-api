@@ -1,21 +1,35 @@
-const router = require('express').Router();
-const {ensureAuthenticated,ensureAuthorized} = require('../middleware/auth-middleware')
-const {getAll, getOne} = require('../controllers/admin-controller')
-const {register} = require('../controllers/auth-controller')
+const router = require("express").Router();
+const { ensureAuthenticated, ensureAuthorized } = require("../middleware/auth-middleware");
+const { register } = require("../controllers/auth-controller");
 
+const { getAll, getOne } = require("../controllers/admin-controller");
 
-router.get('/users',ensureAuthenticated,ensureAuthorized(['admin']),async(req,res)=>{
-    await getAll(req,res);
+router.get("/users", ensureAuthenticated, ensureAuthorized(["admin"]), async(req, res) => {
+    /*
+        #swagger.tags = ['Admin']
+        #swagger.security = [{
+            "Authorization": []
+        }]
+    */
+    await getAll(req, res);
 });
 
-router.get('/users/:id',ensureAuthenticated,ensureAuthorized(['admin']),async(req,res)=>{
-    await getOne(req,res);
+router.get("/users/:id", ensureAuthenticated, ensureAuthorized(["admin"]), async(req, res) => {
+
+    /*
+        #swagger.tags = ['Admin']
+        #swagger.security = [{
+            "Authorization": []
+        }]
+    */
+    await getOne(req, res);
 });
 
 router.get("/seed", async(req, res) => {
+    //#swagger.tags = ['Admin']
     const admin = {
         name: "Administrator",
-        email: "felixokothtestemails@gmail.com",
+        email: "felixokothtestemail@gmail.com",
         password: "test_pass"
     };
 
