@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const router = require('./routes/index')
 const morgan = require('morgan');
 const cors = require('cors');
 const paginate = require('express-paginate');
@@ -10,11 +11,14 @@ require('dotenv').config();
 
 //Middleware
 app.use(cors());
+app.use(express.urlencoded({ extended: false }))
 app.use(express.json());
 app.use(morgan('tiny'));
 app.use(passport.initialize());
+require("./middleware/passport-middleware")(passport);
 
 app.use(paginate.middleware(process.env.LIMIT, process.env.MAX_LIMIT));
+app.use(router)
 
 const runApp = async () => {
     try {
