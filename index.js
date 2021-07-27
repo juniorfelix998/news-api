@@ -1,13 +1,16 @@
+require('dotenv').config();
 const express = require('express');
-const app = express();
-const router = require('./routes/index')
 const morgan = require('morgan');
 const cors = require('cors');
 const paginate = require('express-paginate');
 const passport = require('passport');
 const { connect } = require('mongoose');
+const swaggerUi = require("swagger-ui-express");
+const swaggerFile = require("./swagger_output.json");
 
-require('dotenv').config();
+
+const app = express();
+const router = require('./routes/index')
 
 //Middleware
 app.use(cors());
@@ -19,6 +22,7 @@ require("./middleware/passport-middleware")(passport);
 
 app.use(paginate.middleware(process.env.LIMIT, process.env.MAX_LIMIT));
 app.use(router)
+app.use("/doc", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 const runApp = async () => {
     try {
