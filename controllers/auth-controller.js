@@ -1,7 +1,8 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const crypto = require("crypto");
-const User = require('../models/user')
+// const crypto = require("crypto");
+const User = require('../models/user');
+const { welcomeSender, forgotPasswordSender } = require("../mailers/senders");
 
 const register = async (data,role,res) =>{
     try{
@@ -15,16 +16,18 @@ const register = async (data,role,res) =>{
         }
 
         const hashedPassword = await bcrypt.hash(data.password, 16);
-        const code = crypto.randomInt(100000, 1000000);
+        // const code = crypto.randomInt(100000, 1000000);
+
 
         const newUser = new User({
             ...data,
             password: hashedPassword,
-            verificationCode:code,
+            verificationCode:55555,
             role
         });
 
         await newUser.save();
+        welcomeSender(newUser.email, newUser.name, newUser.verificationCode);
         return res.status(201).json({
             message: "Account successfully created",
             success: true,
@@ -135,7 +138,7 @@ const forgotPassword = async (data,res) => {
         const code = crypto.randomInt(100000, 1000000);
         const passwordResetCode = await bcrypt.hash(code.toString(), 16);
         await user.update({passwordResetCode : passwordResetCode});
-        // forgotPasswordSender(user.email, user.name, code);
+        forgotPasswordSender(user.email, user.name, code);
         return res.status(404).json({
             message: "Verification code sent to your email",
             success: true,
