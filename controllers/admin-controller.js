@@ -2,7 +2,7 @@ const User = require("../models/user");
 const paginate = require("express-paginate");
 
 
-const getAll = async(req, res) => {
+const getall = async(req, res) => {
     try {
         const [results, itemCount] = await
             Promise.all([
